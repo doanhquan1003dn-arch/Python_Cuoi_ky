@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation, FFMpegWriter
 
 SO_HAT = 3
-SO_KHUNG = 180
+SO_GIAY = 30
 FPS = 6
+SO_KHUNG = SO_GIAY * FPS
 GIOI_HAN = 5
 
 rng = np.random.default_rng(12)
@@ -47,12 +48,13 @@ mau_chu = ['navy', 'darkred', 'darkgreen']
 nhan = [fig.text(0.08, 0.91, '', color='navy', fontsize=11),
         fig.text(0.08, 0.07, '', color='darkred', fontsize=11),
         fig.text(0.50, 0.07, '', color='darkgreen', fontsize=11)]
+nhan_thoi_gian = fig.text(0.50, 0.91, '', ha='right', fontsize=11, color='black')
 
 hat_3d = []
 hat_2d = []
 for k in range(SO_HAT):
-    hat_3d.append(ax.scatter([], [], [], s=12, color=mau_chu[k], depthshade=False))
-    hat_2d.append([a.scatter([], [], s=8, color=mau_chu[k])
+    hat_3d.append(ax.scatter([], [], [], s=36, color=mau_chu[k], depthshade=False))
+    hat_2d.append([a.scatter([], [], s=24, color=mau_chu[k])
                    for a in hinh_chieu])
 
 def ve(khung):
@@ -66,12 +68,13 @@ def ve(khung):
             hat_2d[k][h].set_color(sac_do)
         x, y, z = duong[-1]
         nhan[k].set_text(f'● ({x:.2f}, {y:.2f}, {z:.2f})')
-    return hat_3d + [p for nhom in hat_2d for p in nhom] + nhan
+    nhan_thoi_gian.set_text(f'Thời gian: {khung / (SO_KHUNG - 1) * SO_GIAY:.1f} giây')
+    return hat_3d + [p for nhom in hat_2d for p in nhom] + nhan + [nhan_thoi_gian]
 
 phim = FuncAnimation(fig, ve, frames=SO_KHUNG, interval=1000 / FPS, blit=False)
 phim.save('Cau_1_Brown/output/brownian_30s.mp4', writer=FFMpegWriter(fps=FPS, codec='libx264',
            bitrate=1200, extra_args=['-pix_fmt', 'yuv420p']), dpi=76)
-ve(SO_KHUNG - 1)
+ve(SO_KHUNG - 1)  # Cùng trạng thái cuối của khung hình cuối trong video.
 fig.savefig('Cau_1_Brown/output/anh_brown.png', dpi=120)
 plt.close(fig)
 print('Da xuat video Brown 30 giay. Tat ca cac hat o trong hop:', bool(np.all(np.abs(vi_tri) <= GIOI_HAN)))
